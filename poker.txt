@@ -1,0 +1,1131 @@
+1) FCFS with sort:
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    // Arrays for process data
+    int pid[10], at[10], bt[10], ct[10], tat[10], wt[10];
+    int temp;
+
+    // Input
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "\nEnter Arrival Time for Process " << pid[i] << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for Process " << pid[i] << ": ";
+        cin >> bt[i];
+    }
+
+    // Sort by Arrival Time (Bubble Sort)
+    for(int i = 0; i < n - 1; i++) {
+        for(int j = 0; j < n - i - 1; j++) {
+            if(at[j] > at[j+1]) {
+                // Swap AT
+                temp = at[j]; at[j] = at[j+1]; at[j+1] = temp;
+                // Swap BT
+                temp = bt[j]; bt[j] = bt[j+1]; bt[j+1] = temp;
+                // Swap PID
+                temp = pid[j]; pid[j] = pid[j+1]; pid[j+1] = temp;
+            }
+        }
+    }
+
+    // Calculate Completion Time (with idle time handling)
+    int current_time = 0;
+    for(int i = 0; i < n; i++) {
+        if(current_time < at[i]) {
+            current_time = at[i]; // CPU was idle, jump to arrival time
+        }
+        ct[i] = current_time + bt[i];
+        current_time = ct[i];
+    }
+
+    // Calculate TAT and WT
+    for(int i = 0; i < n; i++) {
+        tat[i] = ct[i] - at[i];
+        wt[i] = tat[i] - bt[i];
+    }
+
+    // Output Table
+    cout << "\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t"
+             << at[i] << "\t"
+             << bt[i] << "\t"
+             << ct[i] << "\t"
+             << tat[i] << "\t"
+             << wt[i] << endl;
+    }
+
+    // Gantt Chart in format: 0 -- P1 -- 10 -- P2 -- 15 -- ...
+    cout << "\nGantt Chart:\n";
+    cout << at[0]; // Start time of first process
+
+    for(int i = 0; i < n; i++) {
+        cout << " -- P" << pid[i] << " -- " << ct[i];
+    }
+    cout << endl;
+
+    return 0;
+}
+
+
+FCFS without sort :
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    // Arrays for process data
+    int pid[10], at[10], bt[10], ct[10], tat[10], wt[10];
+
+    // Input
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "\nEnter Arrival Time for Process " << pid[i] << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for Process " << pid[i] << ": ";
+        cin >> bt[i];
+    }
+
+    // Calculate Completion Time (NO SORTING - input order maintained)
+    int current_time = 0;
+    for(int i = 0; i < n; i++) {
+        if(current_time < at[i]) {
+            current_time = at[i]; // CPU idle, wait until arrival
+        }
+        ct[i] = current_time + bt[i];
+        current_time = ct[i];
+    }
+
+    // Calculate TAT and WT
+    for(int i = 0; i < n; i++) {
+        tat[i] = ct[i] - at[i];
+        wt[i] = tat[i] - bt[i];
+    }
+
+    // Output Table
+    cout << "\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t"
+             << at[i] << "\t"
+             << bt[i] << "\t"
+             << ct[i] << "\t"
+             << tat[i] << "\t"
+             << wt[i] << endl;
+    }
+
+    // Gantt Chart in format: 0 -- P1 -- 10 -- P2 -- 15 -- ...
+    cout << "\nGantt Chart:\n";
+    cout << at[0]; // Start time of first process
+
+    for(int i = 0; i < n; i++) {
+        cout << " -- P" << pid[i] << " -- " << ct[i];
+    }
+    cout << endl;
+
+    return 0;
+
+
+
+
+
+
+3) etay main with avg
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int pid[10], at[10], bt[10], ct[10], tat[10], wt[10];
+    int total_wt = 0, total_tat = 0;
+
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "\nEnter Arrival Time for Process " << pid[i] << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for Process " << pid[i] << ": ";
+        cin >> bt[i];
+    }
+
+    int current_time = 0;
+    for(int i = 0; i < n; i++) {
+        if(current_time < at[i]) {
+            current_time = at[i];
+        }
+        ct[i] = current_time + bt[i];
+        current_time = ct[i];
+    }
+
+    for(int i = 0; i < n; i++) {
+        tat[i] = ct[i] - at[i];
+        wt[i] = tat[i] - bt[i];
+        total_wt += wt[i];
+        total_tat += tat[i];
+    }
+
+    cout << "\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t"
+             << at[i] << "\t"
+             << bt[i] << "\t"
+             << ct[i] << "\t"
+             << tat[i] << "\t"
+             << wt[i] << endl;
+    }
+
+    cout << "\nGantt Chart:\n";
+    int time = 0;
+    cout << time;
+
+    for(int i = 0; i < n; i++) {
+        if(time < at[i]) {
+            cout << " -- Idle -- " << at[i];
+            time = at[i];
+        }
+        cout << " -- P" << pid[i] << " -- " << ct[i];
+        time = ct[i];
+    }
+    cout << endl;
+
+    cout << "\nAverage Waiting Time: " 
+         << total_wt / n << endl;
+
+    cout << "Average Turnaround Time: " 
+         << total_tat / n << endl;
+
+    return 0;
+}
+
+>>main ta sort sho
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int pid[10], at[10], bt[10], ct[10], tat[10], wt[10];
+    int total_wt = 0, total_tat = 0;
+
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "\nEnter Arrival Time for Process " << pid[i] << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for Process " << pid[i] << ": ";
+        cin >> bt[i];
+    }
+
+    for(int i = 0; i < n - 1; i++) {
+        for(int j = 0; j < n - i - 1; j++) {
+            if(at[j] > at[j+1]) {
+                int temp_at = at[j];
+                at[j] = at[j+1];
+                at[j+1] = temp_at;
+
+                int temp_bt = bt[j];
+                bt[j] = bt[j+1];
+                bt[j+1] = temp_bt;
+
+                int temp_pid = pid[j];
+                pid[j] = pid[j+1];
+                pid[j+1] = temp_pid;
+            }
+        }
+    }
+
+    int current_time = 0;
+    for(int i = 0; i < n; i++) {
+        if(current_time < at[i]) {
+            current_time = at[i];
+        }
+        ct[i] = current_time + bt[i];
+        current_time = ct[i];
+    }
+
+    for(int i = 0; i < n; i++) {
+        tat[i] = ct[i] - at[i];
+        wt[i] = tat[i] - bt[i];
+        total_wt += wt[i];
+        total_tat += tat[i];
+    }
+
+    cout << "\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t"
+             << at[i] << "\t"
+             << bt[i] << "\t"
+             << ct[i] << "\t"
+             << tat[i] << "\t"
+             << wt[i] << endl;
+    }
+
+    cout << "\nGantt Chart:\n";
+    int time = 0;
+    cout << time;
+
+    for(int i = 0; i < n; i++) {
+        if(time < at[i]) {
+            cout << " -- Idle -- " << at[i];
+            time = at[i];
+        }
+        cout << " -- P" << pid[i] << " -- " << ct[i];
+        time = ct[i];
+    }
+    cout << endl;
+
+    cout << "\nAverage Waiting Time: " 
+         << (float)total_wt / n << endl;
+
+    cout << "Average Turnaround Time: " 
+         << (float)total_tat / n << endl;
+
+    return 0;
+}
+
+
+2)) SJF
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int at[10], bt[10], ct[10], tat[10], wt[10];
+    bool done[10] = {false}; // কোন প্রসেস শেষ হয়েছে তা ট্র্যাক করার জন্য
+
+    // Input
+    for(int i = 0; i < n; i++) {
+        cout << "\nEnter Arrival Time for P" << (i+1) << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for P" << (i+1) << ": ";
+        cin >> bt[i];
+    }
+
+    int time = 0;       // বর্তমান সময়
+    int completed = 0;  // কতগুলো প্রসেস শেষ হয়েছে
+    int total_wt = 0, total_tat = 0;
+
+    cout << "\nGantt Chart:\n";
+    cout << time; // শুরু সময় (সাধারণত 0)
+
+    while(completed < n) {
+        int idx = -1;         // mne amr hate ekhono kno process nei,kujtci ekhono
+        int min_bt = 100000;  // shob theke kom BT khujar jnno like 5<10000 theke choto hoite hobe shob
+
+        // রেডি কিউ থেকে shortest job খুঁজুন
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !done[i]) {
+                if(bt[i] < min_bt) {
+                    min_bt = bt[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+            // প্রসেস এক্সিকিউট করুন
+            cout << " -- P" << (idx+1) << " -- ";
+
+            time += bt[idx];      // সময় বাড়ান
+            ct[idx] = time;       // Completion Time
+            tat[idx] = ct[idx] - at[idx]; // Turnaround Time
+            wt[idx] = tat[idx] - bt[idx]; // Waiting Time
+
+            total_wt += wt[idx];
+            total_tat += tat[idx];
+
+            done[idx] = true;     // প্রসেস শেষ হিসেবে চিহ্নিত করুন
+            completed++;
+
+            cout << time;         // শেষ সময় প্রিন্ট করুন
+        }
+        else {
+            // CPU Idle
+            cout << " -- Idle -- ";
+            time++;               // সময় ১ ইউনিট বাড়ান
+            cout << time;         // নতুন সময় প্রিন্ট করুন
+        }
+    }
+
+    // Output Table
+    cout << "\n\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << (i+1) << "\t" << at[i] << "\t" << bt[i] << "\t"
+             << ct[i] << "\t" << tat[i] << "\t" << wt[i] << endl;
+    }
+
+    // Average Times
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
+
+>>>>>>>>>
+direct_input niye
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    // ১. প্রসেসের সংখ্যা নির্ধারণ
+    int n = 5;
+
+    // ২. হার্ডকোডেড ডাটা (Arrival Time এবং Burst Time)
+    // তুমি চাইলে এই মানগুলো পরিবর্তন করতে পারো
+    int at[10] = {4, 0, 1, 6, 2};  // Arrival Times
+    int bt[10] = {5, 2, 5, 7, 3};  // Burst Times
+
+    int ct[10], tat[10], wt[10];
+    bool done[10] = {false}; // কোন প্রসেস শেষ হয়েছে তা ট্র্যাক করার জন্য
+
+    int time = 0;       // বর্তমান সময়
+    int completed = 0;  // কতগুলো প্রসেস শেষ হয়েছে
+    int total_wt = 0, total_tat = 0;
+
+    cout << "Process\tAT\tBT\tCT\tTAT\tWT\n";
+    cout << "-------------------------------------\n";
+
+    cout << "\nGantt Chart:\n";
+    cout << time; // শুরু সময় (সাধারণত 0)
+
+    while (completed < n) {
+        int idx = -1;         // কোন প্রসেস নেওয়া হবে
+        int min_bt = 100000;  // সবচেয়ে কম বাস্ট টাইম খুঁজার জন্য
+
+        // রেডি কিউ থেকে shortest job খুঁজুন
+        for (int i = 0; i < n; i++) {
+            if (at[i] <= time && !done[i]) {
+                if (bt[i] < min_bt) {
+                    min_bt = bt[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if (idx != -1) {
+            // প্রসেস এক্সিকিউট করুন
+            cout << " -- P" << (idx + 1) << " -- ";
+
+            time += bt[idx];      // সময় বাড়ান
+            ct[idx] = time;       // Completion Time
+            tat[idx] = ct[idx] - at[idx]; // Turnaround Time
+            wt[idx] = tat[idx] - bt[idx]; // Waiting Time
+
+            total_wt += wt[idx];
+            total_tat += tat[idx];
+
+            done[idx] = true;     // প্রসেস শেষ হিসেবে চিহ্নিত করুন
+            completed++;
+
+            cout << time;         // শেষ সময় প্রিন্ট করুন
+        } else {
+            // CPU Idle
+            cout << " -- Idle -- ";
+            time++;               // সময় ১ ইউনিট বাড়ান
+            cout << time;         // নতুন সময় প্রিন্ট করুন
+        }
+    }
+
+    // Output Table Print
+    cout << "\n\n";
+    for (int i = 0; i < n; i++) {
+        cout << "P" << (i + 1) << "\t"
+             << at[i] << "\t"
+             << bt[i] << "\t"
+             << ct[i] << "\t"
+             << tat[i] << "\t"
+             << wt[i] << endl;
+    }
+
+    // Average Times
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+3) SRTF(premmetive)
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 5;
+
+    
+    int at[10] = {3, 1, 4, 0, 2}; 
+    int bt[10] = {1, 4, 2, 6, 3}; 
+
+    int rt[10]; // Remaining Time track korar jnno
+    for(int i=0; i<n; i++) rt[i] = bt[i]; // surute Remaining Time = Burst Time
+
+    int ct[10], tat[10], wt[10];
+    bool completed[10] = {false};
+
+    int time = 0;
+    int completed_count = 0;
+    int total_wt = 0, total_tat = 0;
+
+    cout << "Gantt Chart:\n";
+    cout << time; // starting time
+
+    while(completed_count < n) {
+        int idx = -1; // dhore neci surute kno process pawa jay nay
+        int min_rt = 100000;
+
+        // shob cheye kom remaining time er process kujtci
+        for(int i=0; i<n; i++) {
+            if(at[i] <= time && !completed[i]) { //procee ashce kintu not completed?
+                if(rt[i] < min_rt) { //Remaining  time ki ager min_time 10000 thekeo ki choto?kina
+                    min_rt = rt[i]; //choto hole notun choto RT mone rakbo
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) { // mne process khuje paici
+        
+            //time barte thakte and remiang time kombe 
+            rt[idx]--;
+            time++;
+
+            // process jokhn sesh hye jay ekbare
+            if(rt[idx] == 0) {
+                completed[idx] = true;
+                ct[idx] = time;
+                tat[idx] = ct[idx] - at[idx];
+                wt[idx] = tat[idx] - bt[idx];
+
+                total_wt += wt[idx];
+                total_tat += tat[idx];
+
+                completed_count++;
+            }
+
+        } else {
+            // CPU Idle
+            cout << " -- Idle -- " << (time + 1);
+            time++;
+        }
+
+    }
+
+
+// part 2 eta hocce gant chart akar jnno 
+    for(int i=0; i<n; i++) rt[i] = bt[i];
+    for(int i=0; i<n; i++) completed[i] = false;
+    time = 0;
+    completed_count = 0;
+
+    cout << "\n\nFinal Gantt Chart:\n";
+    cout << "0";
+
+    int last_process = -1; // ager process track korar jnno
+
+    while(completed_count < n) {
+        int idx = -1;
+        int min_rt = 100000;
+
+        for(int i=0; i<n; i++) {
+            if(at[i] <= time && !completed[i]) {
+                if(rt[i] < min_rt) {
+                    min_rt = rt[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+        
+            if(last_process != idx) {
+                cout << " -- P" << (idx+1);
+                last_process = idx;
+            }
+
+            rt[idx]--;
+            time++;
+
+            if(rt[idx] == 0) {
+                completed[idx] = true;
+                completed_count++;
+                cout << " -- " << time; // process sesh howar shomoy
+                last_process = -1; // porer process jnno reset
+            }
+        } else {
+            cout << " -- Idle -- " << (time + 1);
+            time++;
+            last_process = -1;
+        }
+    }
+
+    // Output Table
+    cout << "\n\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
+    for(int i=0; i<n; i++) {
+        cout << "P" << (i+1) << "\t" << at[i] << "\t" << bt[i] << "\t"
+             << ct[i] << "\t" << tat[i] << "\t" << wt[i] << endl;
+    }
+
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
+
+
+......
+
+#include <iostream> // হেডার ফাইল ইনক্লুড করা
+using namespace std; // স্ট্যান্ডার্ড নেমস্পেস ব্যবহার করা
+
+int main() {
+    int n; // প্রসেসের সংখ্যা রাখার ভেরিয়েবল
+    
+    // ১. ইউজার থেকে প্রসেসের সংখ্যা ইনপুট নেওয়া
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    // অ্যারে ডিক্লেয়ারেশন (সর্বোচ্চ ১০টি প্রসেস ধরা হয়েছে)
+    int at[10], bt[10], rt[10]; // AT=Arrival Time, BT=Burst Time, RT=Remaining Time
+    int ct[10], tat[10], wt[10]; // CT=Completion Time, TAT=Turnaround Time, WT=Waiting Time
+    bool completed[10]; // কোন প্রসেস শেষ হয়েছে তা ট্র্যাক করার বুলিয়ান অ্যারে
+
+    // ২. ইউজার থেকে প্রতিটি প্রসেসের AT এবং BT ইনপুট নেওয়া
+    for(int i = 0; i < n; i++) {
+        cout << "\nEnter Arrival Time for Process P" << (i + 1) << ": ";
+        cin >> at[i]; // অ্যারাইভাল টাইম ইনপুট
+        
+        cout << "Enter Burst Time for Process P" << (i + 1) << ": ";
+        cin >> bt[i]; // বাস্ট টাইম ইনপুট
+        
+        rt[i] = bt[i]; // শুরুতে Remaining Time = Burst Time সেট করা
+        completed[i] = false; // শুরুতে সব প্রসেস অসম্পন্ন (false)
+    }
+
+    // ভেরিয়েবল ইনিশিয়ালাইজেশন
+    int time = 0;           // বর্তমান সময় (Clock) শুরুতে ০
+    int completed_count = 0; // কতগুলো প্রসেস শেষ হয়েছে তা গণনা করার কাউন্টার
+    int total_wt = 0;       // মোট ওয়েটিং টাইম জমা রাখার জন্য
+    int total_tat = 0;      // মোট টার্নঅরাউন্ড টাইম জমা রাখার জন্য
+
+    // --- পার্ট ১: CT, TAT, WT হিসাব করার লুপ ---
+    // যতক্ষণ না সব প্রসেস (n) সম্পন্ন হয়, ততক্ষণ লুপ চলবে
+    while(completed_count < n) {
+        
+        int idx = -1;         // কোন প্রসেস সিলেক্ট হবে তা ট্র্যাক করার জন্য (-1 মানে কোনোটা নয়)
+        int min_rt = 100000;  // সবচেয়ে কম Remaining Time খুঁজার জন্য একটি বড় সংখ্যা
+
+        // সব প্রসেস চেক করে Shortest Remaining Time খুঁজে বের করা
+        for(int i = 0; i < n; i++) {
+            // শর্ত ১: প্রসেসটি কি এসে গেছে? (AT <= current time)
+            // শর্ত ২: প্রসেসটি কি এখনও শেষ হয়নি? (!completed)
+            if(at[i] <= time && !completed[i]) {
+                // যদি এই প্রসেসের RT আগের সবচেয়ে ছোট RT এর চেয়েও ছোট হয়
+                if(rt[i] < min_rt) {
+                    min_rt = rt[i]; // নতুন সবচেয়ে ছোট RT আপডেট করা
+                    idx = i;        // এই প্রসেসের ইনডেক্স সেভ করা
+                }
+            }
+        }
+
+        // যদি কোনো প্রসেস পাওয়া যায় (idx != -1)
+        if(idx != -1) {
+            rt[idx]--;  // নির্বাচিত প্রসেসের Remaining Time ১ ইউনিট কমানো (Preemption চেকের জন্য)
+            time++;     // বর্তমান সময় ১ ইউনিট বাড়ানো
+
+            // যদি প্রসেসটির কাজ সম্পূর্ণ শেষ হয়ে যায় (RT == 0)
+            if(rt[idx] == 0) {
+                completed[idx] = true;      // প্রসেসটিকে 'সম্পন্ন' চিহ্নিত করা
+                ct[idx] = time;             // Completion Time = বর্তমান সময়
+                tat[idx] = ct[idx] - at[idx]; // Turnaround Time = CT - AT
+                wt[idx] = tat[idx] - bt[idx]; // Waiting Time = TAT - BT
+                
+                total_wt += wt[idx];        // মোট WT এর সাথে যোগ করা
+                total_tat += tat[idx];      // মোট TAT এর সাথে যোগ করা
+                
+                completed_count++;          // সম্পন্ন প্রসেসের সংখ্যা ১ বাড়ানো
+            }
+        } 
+        else {
+            // যদি কোনো প্রসেস পাওয়া না যায় (সবাই আসেনি), তবে CPU Idle থাকে
+            time++; // সময় ১ ইউনিট বাড়িয়ে আবার চেক করা
+        }
+    }
+
+    // --- পার্ট ২: গ্যান্ট চার্ট প্রিন্ট করার জন্য রিসেট এবং সিমুলেশন ---
+    
+    // ভেরিয়েবলগুলো আবার রিসেট করা যাতে গ্যান্ট চার্টের জন্য নতুন করে শুরু করা যায়
+    for(int i = 0; i < n; i++) {
+        rt[i] = bt[i];       // RT কে আবার BT এর সমান করা
+        completed[i] = false; // সব প্রসেসকে আবার 'অসম্পন্ন' করা
+    }
+    time = 0;               // সময়কে আবার ০ থেকে শুরু করা
+    completed_count = 0;    // কাউন্টারকে শূন্য করা
+
+    cout << "\n\nFinal Gantt Chart:\n";
+    cout << time; // গ্যান্ট চার্ট শুরু সময় ০ দিয়ে প্রিন্ট করা
+
+    int last_process = -1; // আগের প্রসেস ট্র্যাক করার জন্য (যাতে বারবার নাম না প্রিন্ট হয়)
+
+    // গ্যান্ট চার্ট তৈরির লুপ (লজিক একই, শুধু প্রিন্টিং যুক্ত)
+    while(completed_count < n) {
+        int idx = -1;
+        int min_rt = 100000;
+
+        // আবার Shortest Remaining Time খুঁজে বের করা
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !completed[i]) {
+                if(rt[i] < min_rt) {
+                    min_rt = rt[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+            // যদি আগের প্রসেস আর বর্তমান প্রসেস একই না হয়, তবে নতুন ব্লক শুরু
+            if(last_process != idx) {
+                cout << " -- P" << (idx + 1); // প্রসেসের নাম প্রিন্ট (P1, P2...)
+                last_process = idx;           // বর্তমান প্রসেসকে 'last_process' হিসেবে সেট করা
+            }
+
+            rt[idx]--; // ১ ইউনিট কাজ করা
+            time++;    // ১ ইউনিট সময় বাড়ানো
+
+            // যদি প্রসেস শেষ হয়ে যায়
+            if(rt[idx] == 0) {
+                completed[idx] = true;
+                completed_count++;
+                cout << " -- " << time; // প্রসেস শেষ হওয়ার সময় প্রিন্ট করা
+                last_process = -1;      // পরবর্তী প্রসেসের জন্য রিসেট
+            }
+        } 
+        else {
+            // CPU Idle হলে
+            cout << " -- Idle -- " << (time + 1); // Idle এবং নতুন সময় প্রিন্ট করা
+            time++; // সময় বাড়ানো
+            last_process = -1;
+        }
+    }
+
+    // --- পার্ট ৩: ফাইনাল টেবিল এবং গড় মান প্রিন্ট করা ---
+    
+    cout << "\n\nProcess\tAT\tBT\tCT\tTAT\tWT\n"; // টেবিলের হেডার
+    cout << "---------------------------------------------\n";
+    
+    for(int i = 0; i < n; i++) {
+        // প্রতিটি প্রসেসের বিস্তারিত তথ্য টেবিল আকারে প্রিন্ট করা
+        cout << "P" << (i + 1) << "\t" 
+             << at[i] << "\t" 
+             << bt[i] << "\t"
+             << ct[i] << "\t" 
+             << tat[i] << "\t" 
+             << wt[i] << endl;
+    }
+
+    // গড় ওয়েটিং টাইম এবং টার্নঅরাউন্ড টাইম বের করা ও প্রিন্ট করা
+    // (float) ব্যবহার করা হয়েছে যাতে দশমিক মান সঠিক আসে
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0; // প্রোগ্রাম সফলভাবে শেষ
+}
+
+
+
+
+
+
+
+
+
+4) Priority (HIgher value higher priority)---NOn preemitive
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int pid[10], at[10], bt[10], pr[10];
+    int ct[10], tat[10], wt[10];
+    bool done[10] = {false};
+
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "\nEnter Arrival Time for P" << pid[i] << ": ";
+        cin >> at[i];
+        
+        cout << "Enter Burst Time for P" << pid[i] << ": ";
+        cin >> bt[i];
+        
+        cout << "Enter Priority for P" << pid[i] << " (Higher is better): ";
+        cin >> pr[i];
+    }
+
+    int time = 0;
+    int completed = 0;
+    int total_wt = 0, total_tat = 0;
+
+    cout << "\nGantt Chart:\n";
+    cout << time;
+
+    while(completed < n) {
+        int idx = -1;
+        int max_priority = -1;
+
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !done[i]) {
+                if(pr[i] > max_priority) {
+                    max_priority = pr[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+            cout << " -- P" << (idx+1) << " -- ";
+
+            time += bt[idx];
+            ct[idx] = time;
+            tat[idx] = ct[idx] - at[idx];
+            wt[idx] = tat[idx] - bt[idx];
+
+            total_wt += wt[idx];
+            total_tat += tat[idx];
+
+            done[idx] = true;
+            completed++;
+
+            cout << time;
+        } 
+        else {
+            cout << " -- Idle -- ";
+            time++;
+            cout << time;
+        }
+    }
+
+    cout << "\n\nProcess\tAT\tBT\tPR\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t" 
+             << at[i] << "\t" 
+             << bt[i] << "\t"
+             << pr[i] << "\t" 
+             << ct[i] << "\t" 
+             << tat[i] << "\t" 
+             << wt[i] << endl;
+    }
+
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
+
+
+Priority (Preemetive )
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int at[10], bt[10], pr[10]; // Arrival, Burst, Priority
+    int rt[10];                 // Remaining Time
+    int ct[10], tat[10], wt[10];
+    bool completed[10] = {false};
+
+    // Input
+    for(int i = 0; i < n; i++) {
+        cout << "\nEnter Arrival Time for P" << (i+1) << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for P" << (i+1) << ": ";
+        cin >> bt[i];
+        cout << "Enter Priority for P" << (i+1) << " (Higher is better): ";
+        cin >> pr[i];
+        
+        rt[i] = bt[i]; // Initially Remaining Time = Burst Time
+    }
+
+    int time = 0;
+    int completed_count = 0;
+    int total_wt = 0, total_tat = 0;
+
+    cout << "\nGantt Chart:\n";
+    cout << time;
+
+    int last_process = -1; // To track process changes for Gantt Chart
+
+    while(completed_count < n) {
+        int idx = -1;
+        int max_priority = -1; // Start with lowest possible priority
+
+        // Find process with Highest Priority among arrived & incomplete processes
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !completed[i]) {
+                if(pr[i] > max_priority) {
+                    max_priority = pr[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+            // If process changed, print new block in Gantt Chart
+            if(last_process != idx) {
+                cout << " -- P" << (idx+1);
+                last_process = idx;
+            }
+
+            rt[idx]--; // Execute for 1 unit
+            time++;    // Move time forward
+
+            if(rt[idx] == 0) {
+                completed[idx] = true;
+                completed_count++;
+                
+                ct[idx] = time;
+                tat[idx] = ct[idx] - at[idx];
+                wt[idx] = tat[idx] - bt[idx];
+                
+                total_wt += wt[idx];
+                total_tat += tat[idx];
+                
+                cout << " -- " << time; // Print completion time
+                last_process = -1;      // Reset for next process
+            }
+        } else {
+            // CPU Idle
+            cout << " -- Idle -- " << (time + 1);
+            time++;
+            last_process = -1;
+        }
+    }
+
+    // Output Table
+    cout << "\n\nProcess\tAT\tBT\tPR\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << (i+1) << "\t" 
+             << at[i] << "\t" 
+             << bt[i] << "\t"
+             << pr[i] << "\t" 
+             << ct[i] << "\t" 
+             << tat[i] << "\t" 
+             << wt[i] << endl;
+    }
+
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
+
+
+priority(lowernum higher priority)++>>
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int at[10], bt[10], pr[10];
+    int rt[10];
+    int ct[10], tat[10], wt[10];
+    bool completed[10] = {false};
+
+    for(int i = 0; i < n; i++) {
+        cout << "\nEnter Arrival Time for P" << (i+1) << ": ";
+        cin >> at[i];
+        cout << "Enter Burst Time for P" << (i+1) << ": ";
+        cin >> bt[i];
+        cout << "Enter Priority for P" << (i+1) << " (Lower is better): ";
+        cin >> pr[i];
+        
+        rt[i] = bt[i];
+    }
+
+    int time = 0;
+    int completed_count = 0;
+    int total_wt = 0, total_tat = 0;
+
+    cout << "\nGantt Chart:\n";
+    cout << time;
+
+    int last_process = -1;
+
+    while(completed_count < n) {
+        int idx = -1;
+        int min_priority = 100000;
+
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !completed[i]) {
+                if(pr[i] < min_priority) {
+                    min_priority = pr[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+            if(last_process != idx) {
+                cout << " -- P" << (idx+1);
+                last_process = idx;
+            }
+
+            rt[idx]--;
+            time++;
+
+            if(rt[idx] == 0) {
+                completed[idx] = true;
+                completed_count++;
+                
+                ct[idx] = time;
+                tat[idx] = ct[idx] - at[idx];
+                wt[idx] = tat[idx] - bt[idx];
+                
+                total_wt += wt[idx];
+                total_tat += tat[idx];
+                
+                cout << " -- " << time;
+                last_process = -1;
+            }
+        } else {
+            cout << " -- Idle -- " << (time + 1);
+            time++;
+            last_process = -1;
+        }
+    }
+
+    cout << "\n\nProcess\tAT\tBT\tPR\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << (i+1) << "\t" 
+             << at[i] << "\t" 
+             << bt[i] << "\t"
+             << pr[i] << "\t" 
+             << ct[i] << "\t" 
+             << tat[i] << "\t" 
+             << wt[i] << endl;
+    }
+
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
+ 
+
+✅ Non-Preemptive Priority Code (Lower Number = Higher Priority):
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    int pid[10], at[10], bt[10], pr[10];
+    int ct[10], tat[10], wt[10];
+    bool done[10] = {false};
+
+    for(int i = 0; i < n; i++) {
+        pid[i] = i + 1;
+        cout << "\nEnter Arrival Time for P" << pid[i] << ": ";
+        cin >> at[i];
+        
+        cout << "Enter Burst Time for P" << pid[i] << ": ";
+        cin >> bt[i];
+        
+        cout << "Enter Priority for P" << pid[i] << " (Lower is better): ";
+        cin >> pr[i];
+    }
+
+    int time = 0;
+    int completed = 0;
+    int total_wt = 0, total_tat = 0;
+
+    cout << "\nGantt Chart:\n";
+    cout << time;
+
+    while(completed < n) {
+        int idx = -1;
+        int min_priority = 100000; // Lower number is better, so start with high value
+
+        // Find process with Lowest Priority Number among arrived & incomplete processes
+        for(int i = 0; i < n; i++) {
+            if(at[i] <= time && !done[i]) {
+                if(pr[i] < min_priority) {
+                    min_priority = pr[i];
+                    idx = i;
+                }
+            }
+        }
+
+        if(idx != -1) {
+            cout << " -- P" << (idx+1) << " -- ";
+
+            time += bt[idx];      // Execute full burst time (Non-Preemptive)
+            ct[idx] = time;
+            tat[idx] = ct[idx] - at[idx];
+            wt[idx] = tat[idx] - bt[idx];
+
+            total_wt += wt[idx];
+            total_tat += tat[idx];
+
+            done[idx] = true;
+            completed++;
+
+            cout << time;
+        } 
+        else {
+            cout << " -- Idle -- ";
+            time++;
+            cout << time;
+        }
+    }
+
+    cout << "\n\nProcess\tAT\tBT\tPR\tCT\tTAT\tWT\n";
+    for(int i = 0; i < n; i++) {
+        cout << "P" << pid[i] << "\t" 
+             << at[i] << "\t" 
+             << bt[i] << "\t"
+             << pr[i] << "\t" 
+             << ct[i] << "\t" 
+             << tat[i] << "\t" 
+             << wt[i] << endl;
+    }
+
+    cout << "\nAverage Waiting Time: " << (float)total_wt / n << endl;
+    cout << "Average Turnaround Time: " << (float)total_tat / n << endl;
+
+    return 0;
+}
