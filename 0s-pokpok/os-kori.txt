@@ -1,0 +1,574 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 5; // processes
+    int m = 3; // resources A, B, C
+
+    int allocation[5][3] = {
+        {0, 1, 0},
+        {2, 0, 0},
+        {3, 0, 2},
+        {2, 1, 1},
+        {0, 0, 2}
+    };
+
+    int maxNeed[5][3] = {
+        {7, 5, 3},
+        {3, 2, 2},
+        {9, 0, 2},
+        {2, 2, 2},
+        {4, 3, 3}
+    };
+
+    int available[3] = {3, 3, 2};
+
+    int need[5][3];
+
+    // Need = Max - Allocation
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            need[i][j] = maxNeed[i][j] - allocation[i][j];
+        }
+    }
+
+    bool finish[5] = {false};
+    int safeSeq[5];
+    int count = 0;
+
+    while (count < n) {
+        bool found = false;
+
+        for (int i = 0; i < n; i++) {
+            if (!finish[i]) {
+                bool canRun = true;
+
+                for (int j = 0; j < m; j++) {
+                    if (need[i][j] > available[j]) {
+                        canRun = false;
+                        break;
+                    }
+                }
+
+                if (canRun) {
+                    for (int j = 0; j < m; j++) {
+                        available[j] += allocation[i][j];
+                    }
+
+                    safeSeq[count] = i;
+                    finish[i] = true;
+                    count++;
+                    found = true;
+                }
+            }
+        }
+
+        if (!found) {
+            cout << "System is not in safe state." << endl;
+            return 0;
+        }
+    }
+
+    cout << "System is in safe state." << endl;
+    cout << "Safe Sequence: ";
+
+    for (int i = 0; i < n; i++) {
+        cout << "T" << safeSeq[i];
+        if (i != n - 1) cout << " -> ";
+    }
+
+    return 0;
+}
+
+//Safe Sequence: T1 -> T3 -> T4 -> T0 -> T2
+
+
+b-2
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    int n, m;
+
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    cout << "Enter number of resource types: ";
+    cin >> m;
+
+    int allocation[n][m], maxNeed[n][m], need[n][m];
+    int available[m];
+
+    cout << "\nEnter Allocation Matrix:\n";
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            cin >> allocation[i][j];
+        }
+    }
+
+    cout << "\nEnter Max Matrix:\n";
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            cin >> maxNeed[i][j];
+        }
+    }
+
+    cout << "\nEnter Available Resources:\n";
+    for (int i = 0; i < m; i++)
+    {
+        cin >> available[i];
+    }
+
+    // Need Matrix
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            need[i][j] = maxNeed[i][j] - allocation[i][j];
+        }
+    }
+
+    bool finish[n] = {false};
+    int safeSeq[n];
+    int count = 0;
+
+    while (count < n)
+    {
+        bool found = false;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (!finish[i])
+            {
+                bool possible = true;
+
+                for (int j = 0; j < m; j++)
+                {
+                    if (need[i][j] > available[j])
+                    {
+                        possible = false;
+                        break;
+                    }
+                }
+
+                if (possible)
+                {
+                    for (int j = 0; j < m; j++)
+                        available[j] += allocation[i][j];
+
+                    safeSeq[count++] = i;
+                    finish[i] = true;
+                    found = true;
+                }
+            }
+        }
+
+        if (!found)
+        {
+            cout << "\nSystem is NOT in Safe State.\n";
+            return 0;
+        }
+    }
+
+    cout << "\nSystem is in Safe State.\n";
+    cout << "Safe Sequence: ";
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << "P" << safeSeq[i];
+        if (i != n - 1)
+            cout << " -> ";
+    }
+
+    cout << endl;
+
+    return 0;
+}
+
+
+lru1=
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, frames;
+
+    cout << "Enter number of pages: ";
+    cin >> n;
+
+    int pages[n];
+
+    cout << "Enter reference string: ";
+    for (int i = 0; i < n; i++) {
+        cin >> pages[i];
+    }
+
+    cout << "Enter number of frames: ";
+    cin >> frames;
+
+    int memory[frames];
+    int lastUsed[frames];
+
+    for (int i = 0; i < frames; i++) {
+        memory[i] = -1;
+        lastUsed[i] = -1;
+    }
+
+    int pageFaults = 0, hits = 0;
+
+    for (int i = 0; i < n; i++) {
+        int page = pages[i];
+        bool found = false;
+
+        // Check hit
+        for (int j = 0; j < frames; j++) {
+            if (memory[j] == page) {
+                found = true;
+                hits++;
+                lastUsed[j] = i;
+                break;
+            }
+        }
+
+        // If miss
+        if (!found) {
+            pageFaults++;
+
+            int replaceIndex = -1;
+
+            // Check empty frame first
+            for (int j = 0; j < frames; j++) {
+                if (memory[j] == -1) {
+                    replaceIndex = j;
+                    break;
+                }
+            }
+
+            // If no empty frame, find least recently used
+            if (replaceIndex == -1) {
+                int minTime = lastUsed[0];
+                replaceIndex = 0;
+
+                for (int j = 1; j < frames; j++) {
+                    if (lastUsed[j] < minTime) {
+                        minTime = lastUsed[j];
+                        replaceIndex = j;
+                    }
+                }
+            }
+
+            memory[replaceIndex] = page;
+            lastUsed[replaceIndex] = i;
+        }
+
+        cout << "Page " << page << " -> ";
+
+        for (int j = 0; j < frames; j++) {
+            if (memory[j] == -1)
+                cout << "- ";
+            else
+                cout << memory[j] << " ";
+        }
+
+        if (found)
+            cout << " Hit";
+        else
+            cout << " Miss";
+
+        cout << endl;
+    }
+
+    cout << "\nTotal Page Faults = " << pageFaults << endl;
+    cout << "Total Hits = " << hits << endl;
+
+    cout << "Hit Ratio = " << (float)hits / n << endl;
+    cout << "Page Fault Ratio = " << (float)pageFaults / n << endl;
+
+    return 0;
+}
+
+
+lru2=
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1};
+    int n = 20;
+    int frames = 3;
+
+    int memory[3] = {-1, -1, -1};
+    int lastUsed[3] = {-1, -1, -1};
+
+    int pageFaults = 0, hits = 0;
+
+    for (int i = 0; i < n; i++) {
+        int page = pages[i];
+        bool found = false;
+
+        // Check Hit
+        for (int j = 0; j < frames; j++) {
+            if (memory[j] == page) {
+                found = true;
+                hits++;
+                lastUsed[j] = i;
+                break;
+            }
+        }
+
+        // If Miss
+        if (!found) {
+            pageFaults++;
+
+            int replaceIndex = -1;
+
+            // Empty frame check
+            for (int j = 0; j < frames; j++) {
+                if (memory[j] == -1) {
+                    replaceIndex = j;
+                    break;
+                }
+            }
+
+            // If no empty frame, replace least recently used page
+            if (replaceIndex == -1) {
+                int minTime = lastUsed[0];
+                replaceIndex = 0;
+
+                for (int j = 1; j < frames; j++) {
+                    if (lastUsed[j] < minTime) {
+                        minTime = lastUsed[j];
+                        replaceIndex = j;
+                    }
+                }
+            }
+
+            memory[replaceIndex] = page;
+            lastUsed[replaceIndex] = i;
+        }
+
+        cout << "Page " << page << " -> ";
+
+        for (int j = 0; j < frames; j++) {
+            if (memory[j] == -1)
+                cout << "- ";
+            else
+                cout << memory[j] << " ";
+        }
+
+        if (found)
+            cout << " Hit";
+        else
+            cout << " Miss";
+
+        cout << endl;
+    }
+
+    cout << "\nTotal Page Faults = " << pageFaults << endl;
+    cout << "Total Hits = " << hits << endl;
+    cout << "Hit Ratio = " << (float)hits / n << endl;
+    cout << "Page Fault Ratio = " << (float)pageFaults / n << endl;
+
+    return 0;
+}
+
+
+scan1
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+int main() {
+    int n, head, diskSize;
+    char direction;
+
+    cout << "Enter number of disk requests: ";
+    cin >> n;
+
+    vector<int> requests(n);
+
+    cout << "Enter disk requests:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> requests[i];
+    }
+
+    cout << "Enter initial head position: ";
+    cin >> head;
+
+    cout << "Enter disk size (maximum cylinder): ";
+    cin >> diskSize;
+
+    cout << "Enter direction (L for Left, R for Right): ";
+    cin >> direction;
+
+    vector<int> left, right, sequence;
+
+    for (int req : requests) {
+        if (req < head)
+            left.push_back(req);
+        else
+            right.push_back(req);
+    }
+
+    if (direction == 'L' || direction == 'l')
+        left.push_back(0);
+    else
+        right.push_back(diskSize - 1);
+
+    sort(left.begin(), left.end());
+    sort(right.begin(), right.end());
+
+    int seekCount = 0;
+    int current = head;
+
+    if (direction == 'R' || direction == 'r') {
+        for (int req : right) {
+            sequence.push_back(req);
+            seekCount += abs(current - req);
+            current = req;
+        }
+
+        for (int i = left.size() - 1; i >= 0; i--) {
+            sequence.push_back(left[i]);
+            seekCount += abs(current - left[i]);
+            current = left[i];
+        }
+    }
+    else {
+        for (int i = left.size() - 1; i >= 0; i--) {
+            sequence.push_back(left[i]);
+            seekCount += abs(current - left[i]);
+            current = left[i];
+        }
+
+        for (int req : right) {
+            sequence.push_back(req);
+            seekCount += abs(current - req);
+            current = req;
+        }
+    }
+
+    cout << "\nSeek Sequence:\n";
+    cout << head;
+
+    for (int x : sequence) {
+        cout << " -> " << x;
+    }
+
+    cout << "\n\nTotal Seek Distance = " << seekCount << endl;
+    cout << "Average Seek Distance = " << (float)seekCount / n << endl;
+
+    return 0;
+}
+
+scan2
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+int main() {
+    int n, head, diskSize;
+    char direction;
+
+    cout << "Enter number of disk requests: ";
+    cin >> n;
+
+    int request[100], left[100], right[100], sequence[200];
+    int l = 0, r = 0, s = 0;
+
+    cout << "Enter disk requests:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> request[i];
+    }
+
+    cout << "Enter initial head position: ";
+    cin >> head;
+
+    cout << "Enter disk size (maximum cylinder): ";
+    cin >> diskSize;
+
+    cout << "Enter direction (L for Left, R for Right): ";
+    cin >> direction;
+
+    for (int i = 0; i < n; i++) {
+        if (request[i] < head)
+            left[l++] = request[i];
+        else
+            right[r++] = request[i];
+    }
+
+    if (direction == 'L' || direction == 'l')
+        left[l++] = 0;
+    else
+        right[r++] = diskSize - 1;
+
+    sort(left, left + l);
+    sort(right, right + r);
+
+    int current = head;
+    int seekCount = 0;
+
+    if (direction == 'R' || direction == 'r') {
+        for (int i = 0; i < r; i++) {
+            sequence[s++] = right[i];
+            seekCount += abs(current - right[i]);
+            current = right[i];
+        }
+
+        for (int i = l - 1; i >= 0; i--) {
+            sequence[s++] = left[i];
+            seekCount += abs(current - left[i]);
+            current = left[i];
+        }
+    }
+    else {
+        for (int i = l - 1; i >= 0; i--) {
+            sequence[s++] = left[i];
+            seekCount += abs(current - left[i]);
+            current = left[i];
+        }
+
+        for (int i = 0; i < r; i++) {
+            sequence[s++] = right[i];
+            seekCount += abs(current - right[i]);
+            current = right[i];
+        }
+    }
+
+    cout << "\nSeek Sequence:\n";
+    cout << head;
+
+    for (int i = 0; i < s; i++) {
+        cout << " -> " << sequence[i];
+    }
+
+    cout << "\n\nTotal Seek Distance = " << seekCount << endl;
+    cout << "Average Seek Distance = " << (float)seekCount / n << endl;
+
+    return 0;
+}
+
+
+
+
+//8
+//98 183 37 122 14 124 65 67
+//53
+///200
+//R
+
+Seek Sequence:
+53 -> 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 199 -> 37 -> 14
+
+Total Seek Distance = 331
+Average Seek Distance = 41.375
